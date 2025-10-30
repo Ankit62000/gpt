@@ -11,25 +11,26 @@ async function registerUser(req,res) {
         return res.status(400).json({message:"User already exists"});
     }
     const hashedPassword = await bcrypt.hash(password,10);
-    const User = await userModel.create({
+    const user = await userModel.create({
         fullName:{firstName,lastName},
         email,
         password:hashedPassword
     });
 
-    const token = jwt.sign({userId:User._id},process.env.JWT_SECRET,)
+    const token = jwt.sign({userId:user._id},process.env.JWT_SECRET,{expiresIn:'7d'});  
 
         res.cookie('token',token,)
 
         res.status(201).json({message:"User registered successfully",
             user:{
-                email:User.email,
-                id:User._id,
-                fullName:User.fullName
+                email:user.email,
+                id:user._id,
+                fullName:user.fullName
             }
         });
     
 }
+
 
 async function loginUser(req,res){
     const {fullName,email,password} = req.body;
